@@ -1,0 +1,40 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: akshealthtest 
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: akshealthtest
+  template:
+    metadata:
+      labels:
+        app: akshealthtest
+    spec:
+      containers:
+        - name: akshealthtest
+          image: aksdevregistry.azurecr.io/akshealthtest:0.2.0
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: 1024Mi
+              cpu: "1"
+          ports:
+            - containerPort: 5000
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 5000
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+            periodSeconds: 10
+            failureThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 5000
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+            periodSeconds: 10
+            failureThreshold: 1
